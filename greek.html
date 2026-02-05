@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#00c9d3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Greek Word Game</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEYSURBVHgB7ZbdDcIwDEUvM+gI7Qjc6AglI8QjMBI9wQwwAh2BEXKDnfyG+SAx7WlViVXo5L04/hYpGRkZGRkZGVMh18rgYruW6+0gn1Cjd9wq3k+BkF3FXY7onbOyrbgrA6i4U4EbiFMwIV5Q3KO4S4E7iLrEC+JtFLeN6QGt3BooEPEYua+4bgTxM9DwYC9uJ0yIN8Q7FO/jIYj3BvEd8VcfN3pR8R9lY3Oc2kvcKYgTdwriiLsFceK+QRzxvoI4cT8Gmij+ZRBxBBGH8eKDBXH2DE8ch8VxTDwciJMcc8TjI3bWJIecEeNihrZcItopGP0v5JCRkZGRkfFP3AFjRjdHqxOXawAAAABJRU5ErkJggg==">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --aqua: #00c9d3;
+            --aqua-dark: #00a8b0;
+            --pink: #ff5c8d;
+            --pink-dark: #e04a7a;
+            --yellow: #ffd166;
+            --yellow-dark: #e6bc5c;
+            --green: #06d6a0;
+            --green-dark: #05b888;
+            --purple: #9d4edd;
+            --purple-dark: #8a3ec4;
+            --gray: #f8f9fa;
+            --gray-dark: #e9ecef;
+            --text: #2d3748;
+            --shadow: 0 8px 20px rgba(0, 201, 211, 0.1);
+            --shadow-hover: 0 12px 25px rgba(0, 201, 211, 0.2);
+            --radius: 24px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .app-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px 0;
+            color: #718096;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 480px) {
+            .app-footer {
+                font-size: 0.85rem;
+                padding: 15px 0;
+                margin-top: 20px;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: white;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            user-select: none;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        }
+
+        #app {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--aqua), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .score-container {
+            position: absolute;
+            right: 0;
+            top: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: var(--aqua);
+            border: 2px solid var(--aqua);
+        }
+
+        .score-icon {
+            font-size: 1.3rem;
+        }
+
+        .word-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--aqua);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .word-card:active {
+            transform: scale(0.98);
+        }
+
+        .word-number {
+            color: var(--pink);
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .button-grid {
+            display: grid;
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .word-button {
+            padding: 22px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 80px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            color: white;
+            letter-spacing: 0.5px;
+            transform: translateY(0);
+        }
+
+        .word-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .word-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .word-button:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(50, 50);
+                opacity: 0;
+            }
+        }
+
+        .button-english {
+            background: linear-gradient(135deg, var(--aqua), var(--aqua-dark));
+        }
+
+        .button-phonetic {
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+        }
+
+        .button-greek {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            font-size: 1.8rem !important;
+            font-weight: 900;
+        }
+
+        .button-meaning {
+            background: linear-gradient(135deg, var(--yellow), var(--yellow-dark));
+            color: #333;
+        }
+
+        .button-meaning.hidden {
+            filter: brightness(0.95);
+            color: rgba(51, 51, 51, 0.7);
+        }
+
+        .button-meaning.hidden::before {
+            content: '???';
+            position: absolute;
+            color: rgba(51, 51, 51, 0.9);
+        }
+
+        .hidden-content {
+            opacity: 0.3;
+            filter: blur(4px);
+            user-select: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .control-button {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            background: white;
+            color: var(--aqua);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid var(--aqua);
+        }
+
+        .control-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 4px 12px rgba(0, 201, 211, 0.15);
+        }
+
+        .control-button.secondary {
+            background: var(--pink);
+            color: white;
+            border: 2px solid var(--pink);
+        }
+
+        .sound-button {
+            width: 100%;
+            padding: 24px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff5c8d, #e04a7a);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(255, 92, 141, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .sound-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 12px rgba(255, 92, 141, 0.2);
+        }
+
+        .sound-icon {
+            font-size: 1.6rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .progress {
+            margin-top: 25px;
+            text-align: center;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .mode-toggle {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            background: white;
+            padding: 10px 18px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            font-weight: 700;
+            color: var(--pink);
+            border: 2px solid var(--pink);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .mode-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .tap-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 201, 211, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0, 201, 211, 0.3);
+            animation: bounce 2s infinite;
+            display: none;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        @media (max-width: 480px) {
+            #app {
+                padding: 15px;
+            }
+            
+            .word-button {
+                padding: 20px 15px;
+                font-size: 1.3rem;
+                min-height: 75px;
+            }
+            
+            .button-greek {
+                font-size: 1.6rem !important;
+            }
+            
+            h1 {
+                font-size: 1.9rem;
+            }
+            
+            .controls {
+                gap: 12px;
+            }
+            
+            .control-button {
+                padding: 18px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .word-button:hover {
+                transform: translateY(-3px);
+                box-shadow: var(--shadow-hover);
+            }
+            
+            .control-button:hover {
+                transform: translateY(-3px);
+            }
+            
+            .sound-button:hover {
+                transform: translateY(-3px);
+            }
+        }
+
+        .vibration-demo {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--pink);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <div class="mode-toggle" id="modeToggle">🔀 RANDOM</div>
+            <br>
+            <br>
+            <br>
+            <hr>
+            <h1>Greek Word Game
+            <hr>
+            </h1>
+            <div class="subtitle">Tap buttons to hear pronunciation • Learn playfully</div>
+            <div class="score-container">
+                <span class="score-icon">🎯</span>
+                <span id="score">0</span>
+            </div>
+        </div>
+
+        <div class="word-card" id="wordCard">
+            <div class="word-number" id="wordNumber">Word #1</div>
+            <div class="button-grid">
+                <button class="word-button button-english" data-type="english">
+                    <span id="englishWord">meet</span>
+                </button>
+                <button class="word-button button-phonetic" data-type="phonetic">
+                    <span id="phonetic">/miːt/</span>
+                </button>
+                <button class="word-button button-greek" data-type="greek">
+                    <span id="greekTranscription">μιτ</span>
+                </button>
+                <button class="word-button button-meaning hidden" id="meaningButton" data-type="meaning">
+                    <span class="hidden-content" id="greekMeaning">συναντώ</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-button" id="prevButton">
+                ← Previous
+            </button>
+            <button class="control-button secondary" id="nextButton">
+                Next →
+            </button>
+        </div>
+
+        <button class="sound-button" id="playAllButton">
+            <span class="sound-icon">🔊</span>
+            Play Full Sound
+        </button>
+
+        <div class="progress" id="progress">1 / 50</div>
+
+        <div class="tap-hint" id="tapHint">Tap any button to hear sound!</div>
+        <div class="vibration-demo" id="vibrationDemo">✓ Vibration!</div>
+    </div>
+
+    <script>
+        const wordData = [
+            { english: "meet", phonetic: "/miːt/", greek_transcription: "μιτ", greek_meaning: "συναντώ" },
+            { english: "hello", phonetic: "/həˈloʊ/", greek_transcription: "χελο", greek_meaning: "γεια" },
+            { english: "thank you", phonetic: "/ˈθæŋk ˌju/", greek_transcription: "θανκ γιου", greek_meaning: "ευχαριστώ" },
+            { english: "goodbye", phonetic: "/ˌɡʊdˈbaɪ/", greek_transcription: "γκουντμπάι", greek_meaning: "αντίο" },
+            { english: "please", phonetic: "/pliːz/", greek_transcription: "πλιζ", greek_meaning: "παρακαλώ" },
+            { english: "yes", phonetic: "/jɛs/", greek_transcription: "γιες", greek_meaning: "ναι" },
+            { english: "no", phonetic: "/noʊ/", greek_transcription: "νοου", greek_meaning: "όχι" },
+            { english: "water", phonetic: "/ˈwɔːtər/", greek_transcription: "γουότερ", greek_meaning: "νερό" },
+            { english: "food", phonetic: "/fuːd/", greek_transcription: "φουντ", greek_meaning: "φαγητό" },
+            { english: "house", phonetic: "/haʊs/", greek_transcription: "χαους", greek_meaning: "σπίτι" },
+            { english: "car", phonetic: "/kɑːr/", greek_transcription: "καρ", greek_meaning: "αυτοκίνητο" },
+            { english: "city", phonetic: "/ˈsɪti/", greek_transcription: "σίτι", greek_meaning: "πόλη" },
+            { english: "street", phonetic: "/striːt/", greek_transcription: "στριτ", greek_meaning: "δρόμος" },
+            { english: "friend", phonetic: "/frɛnd/", greek_transcription: "φρεντ", greek_meaning: "φίλος" },
+            { english: "family", phonetic: "/ˈfæməli/", greek_transcription: "φάμιλι", greek_meaning: "οικογένεια" },
+            { english: "time", phonetic: "/taɪm/", greek_transcription: "τάιμ", greek_meaning: "ώρα" },
+            { english: "day", phonetic: "/deɪ/", greek_transcription: "ντεϊ", greek_meaning: "μέρα" },
+            { english: "night", phonetic: "/naɪt/", greek_transcription: "νάιτ", greek_meaning: "νύχτα" },
+            { english: "morning", phonetic: "/ˈmɔːrnɪŋ/", greek_transcription: "μόρνινγκ", greek_meaning: "πρωί" },
+            { english: "evening", phonetic: "/ˈiːvnɪŋ/", greek_transcription: "ήβνινγκ", greek_meaning: "βράδυ" },
+            { english: "week", phonetic: "/wiːk/", greek_transcription: "γουίκ", greek_meaning: "εβδομάδα" },
+            { english: "month", phonetic: "/mʌnθ/", greek_transcription: "μανθ", greek_meaning: "μήνας" },
+            { english: "year", phonetic: "/jɪr/", greek_transcription: "γιερ", greek_meaning: "χρόνος" },
+            { english: "today", phonetic: "/təˈdeɪ/", greek_transcription: "τουντέι", greek_meaning: "σήμερα" },
+            { english: "tomorrow", phonetic: "/təˈmɑːroʊ/", greek_transcription: "τουμόροου", greek_meaning: "αύριο" },
+            { english: "yesterday", phonetic: "/ˈjɛstərdeɪ/", greek_transcription: "γιέστερντεϊ", greek_meaning: "χθες" },
+            { english: "now", phonetic: "/naʊ/", greek_transcription: "ναου", greek_meaning: "τώρα" },
+            { english: "later", phonetic: "/ˈleɪtər/", greek_transcription: "λέιτερ", greek_meaning: "αργότερα" },
+            { english: "soon", phonetic: "/suːn/", greek_transcription: "σουν", greek_meaning: "σύντομα" },
+            { english: "never", phonetic: "/ˈnɛvər/", greek_transcription: "νέβερ", greek_meaning: "ποτέ" },
+            { english: "always", phonetic: "/ˈɔːlweɪz/", greek_transcription: "όλγουέιζ", greek_meaning: "πάντα" },
+            { english: "sometimes", phonetic: "/ˈsʌmtaɪmz/", greek_transcription: "σάμταϊμζ", greek_meaning: "μερικές φορές" },
+            { english: "often", phonetic: "/ˈɔːfən/", greek_transcription: "όφεν", greek_meaning: "συχνά" },
+            { english: "rarely", phonetic: "/ˈrɛrli/", greek_transcription: "ρέρλι", greek_meaning: "σπάνια" },
+            { english: "big", phonetic: "/bɪɡ/", greek_transcription: "μπιγκ", greek_meaning: "μεγάλος" },
+            { english: "small", phonetic: "/smɔːl/", greek_transcription: "σμόλ", greek_meaning: "μικρός" },
+            { english: "good", phonetic: "/ɡʊd/", greek_transcription: "γκουντ", greek_meaning: "καλός" },
+            { english: "bad", phonetic: "/bæd/", greek_transcription: "μπαντ", greek_meaning: "κακός" },
+            { english: "happy", phonetic: "/ˈhæpi/", greek_transcription: "χάπι", greek_meaning: "ευτυχισμένος" },
+            { english: "sad", phonetic: "/sæd/", greek_transcription: "σαντ", greek_meaning: "λυπημένος" },
+            { english: "beautiful", phonetic: "/ˈbjuːtɪfəl/", greek_transcription: "μπιούτιφουλ", greek_meaning: "όμορφος" },
+            { english: "ugly", phonetic: "/ˈʌɡli/", greek_transcription: "άγκλι", greek_meaning: "άσχημος" },
+            { english: "hot", phonetic: "/hɑːt/", greek_transcription: "χοτ", greek_meaning: "ζεστός" },
+            { english: "cold", phonetic: "/koʊld/", greek_transcription: "κούλντ", greek_meaning: "κρύος" },
+            { english: "fast", phonetic: "/fæst/", greek_transcription: "φαστ", greek_meaning: "γρήγορος" },
+            { english: "slow", phonetic: "/sloʊ/", greek_transcription: "σλοου", greek_meaning: "αργός" },
+            { english: "easy", phonetic: "/ˈiːzi/", greek_transcription: "ίζι", greek_meaning: "εύκολος" },
+            { english: "difficult", phonetic: "/ˈdɪfɪkəlt/", greek_transcription: "ντίφικουλτ", greek_meaning: "δύσκολος" },
+            { english: "cheap", phonetic: "/tʃiːp/", greek_transcription: "τσιπ", greek_meaning: "φτηνός" },
+            { english: "expensive", phonetic: "/ɪkˈspɛnsɪv/", greek_transcription: "εξπένσιβ", greek_meaning: "ακριβός" },
+            { english: "new", phonetic: "/nuː/", greek_transcription: "νιου", greek_meaning: "καινούριος" },
+            { english: "old", phonetic: "/oʊld/", greek_transcription: "όουλντ", greek_meaning: "παλιός" },
+            { english: "young", phonetic: "/jʌŋ/", greek_transcription: "γιανγκ", greek_meaning: "νέος" },
+            { english: "rich", phonetic: "/rɪtʃ/", greek_transcription: "ριτς", greek_meaning: "πλούσιος" },
+            { english: "poor", phonetic: "/pʊr/", greek_transcription: "πουρ", greek_meaning: "φτωχός" },
+            { english: "strong", phonetic: "/strɔːŋ/", greek_transcription: "στρονγκ", greek_meaning: "δυνατός" },
+            { english: "weak", phonetic: "/wiːk/", greek_transcription: "γουίκ", greek_meaning: "αδύναμος" },
+            { english: "healthy", phonetic: "/ˈhɛlθi/", greek_transcription: "χέλθι", greek_meaning: "υγιής" },
+            { english: "sick", phonetic: "/sɪk/", greek_transcription: "σίκ", greek_meaning: "άρρωστος" },
+            { english: "hungry", phonetic: "/ˈhʌŋɡri/", greek_transcription: "χάνγκρι", greek_meaning: "πεινασμένος" },
+            { english: "thirsty", phonetic: "/ˈθɜːrsti/", greek_transcription: "θέρστι", greek_meaning: "διψασμένος" },
+            { english: "tired", phonetic: "/ˈtaɪərd/", greek_transcription: "τάιερντ", greek_meaning: "κουρασμένος" },
+            { english: "awake", phonetic: "/əˈweɪk/", greek_transcription: "αγουέικ", greek_meaning: "ξύπνιος" },
+            { english: "asleep", phonetic: "/əˈsliːp/", greek_transcription: "ασλίπ", greek_meaning: "αποκοιμημένος" },
+            { english: "work", phonetic: "/wɜːrk/", greek_transcription: "γουέρκ", greek_meaning: "δουλειά" },
+            { english: "study", phonetic: "/ˈstʌdi/", greek_transcription: "στάντι", greek_meaning: "μελέτη" },
+            { english: "learn", phonetic: "/lɜːrn/", greek_transcription: "λερν", greek_meaning: "μάθηση" },
+            { english: "teach", phonetic: "/tiːtʃ/", greek_transcription: "τιτς", greek_meaning: "διδασκαλία" },
+            { english: "play", phonetic: "/pleɪ/", greek_transcription: "πλέι", greek_meaning: "παιχνίδι" }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let isRandomMode = false;
+        let speechSynthesis = window.speechSynthesis;
+        let isSpeechSupported = false;
+
+        const elements = {
+            englishWord: document.getElementById('englishWord'),
+            phonetic: document.getElementById('phonetic'),
+            greekTranscription: document.getElementById('greekTranscription'),
+            greekMeaning: document.getElementById('greekMeaning'),
+            meaningButton: document.getElementById('meaningButton'),
+            wordNumber: document.getElementById('wordNumber'),
+            progress: document.getElementById('progress'),
+            score: document.getElementById('score'),
+            prevButton: document.getElementById('prevButton'),
+            nextButton: document.getElementById('nextButton'),
+            playAllButton: document.getElementById('playAllButton'),
+            modeToggle: document.getElementById('modeToggle'),
+            wordCard: document.getElementById('wordCard'),
+            tapHint: document.getElementById('tapHint'),
+            vibrationDemo: document.getElementById('vibrationDemo')
+        };
+
+        const wordButtons = document.querySelectorAll('.word-button');
+
+        function updateWord() {
+            const word = wordData[currentIndex];
+            elements.englishWord.textContent = word.english;
+            elements.phonetic.textContent = word.phonetic;
+            elements.greekTranscription.textContent = word.greek_transcription;
+            elements.greekMeaning.textContent = word.greek_meaning;
+            elements.wordNumber.textContent = `Word #${currentIndex + 1}`;
+            elements.progress.textContent = `${currentIndex + 1} / ${wordData.length}`;
+            
+            elements.meaningButton.classList.add('hidden');
+        }
+
+        function speakText(text, lang = 'en-US', rate = 0.9) {
+            if (!speechSynthesis) return;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = rate;
+            utterance.volume = 1;
+            
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+            
+            return utterance;
+        }
+
+        function vibrate(pattern = [50]) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+                
+                elements.vibrationDemo.style.opacity = '1';
+                setTimeout(() => {
+                    elements.vibrationDemo.style.opacity = '0';
+                }, 300);
+            }
+        }
+
+        function incrementScore() {
+            score++;
+            elements.score.textContent = score;
+            
+            elements.score.parentElement.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                elements.score.parentElement.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        function showTapHint() {
+            if (score === 0) {
+                elements.tapHint.style.display = 'block';
+                setTimeout(() => {
+                    elements.tapHint.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function handleButtonClick(type) {
+            const word = wordData[currentIndex];
+            
+            switch(type) {
+                case 'english':
+                    speakText(word.english, 'en-US');
+                    break;
+                case 'phonetic':
+                    speakText(word.english, 'en-US');
+                    break;
+                case 'greek':
+                    speakText(word.greek_meaning, 'el-GR', 0.8);
+                    break;
+                case 'meaning':
+                    if (elements.meaningButton.classList.contains('hidden')) {
+                        elements.meaningButton.classList.remove('hidden');
+                        setTimeout(() => {
+                            elements.meaningButton.querySelector('.hidden-content').style.opacity = '1';
+                            elements.meaningButton.querySelector('.hidden-content').style.filter = 'blur(0)';
+                        }, 50);
+                    }
+                    speakText(word.greek_meaning, 'el-GR', 0.8);
+                    break;
+            }
+            
+            incrementScore();
+            vibrate([30]);
+            
+            elements.wordCard.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                elements.wordCard.style.transform = 'scale(1)';
+            }, 150);
+            
+            showTapHint();
+        }
+
+        function playAllSounds() {
+            const word = wordData[currentIndex];
+            
+            speakText(word.english, 'en-US');
+            
+            setTimeout(() => {
+                speakText(word.greek_meaning, 'el-GR', 0.8);
+            }, 800);
+            
+            incrementScore();
+            vibrate([50, 50, 50]);
+            
+            elements.playAllButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                elements.playAllButton.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        function navigate(direction) {
+            if (direction === 'next') {
+                if (isRandomMode) {
+                    currentIndex = Math.floor(Math.random() * wordData.length);
+                } else {
+                    currentIndex = (currentIndex + 1) % wordData.length;
+                }
+            } else {
+                currentIndex = (currentIndex - 1 + wordData.length) % wordData.length;
+            }
+            
+            updateWord();
+            vibrate([20]);
+        }
+
+        function toggleMode() {
+            isRandomMode = !isRandomMode;
+            elements.modeToggle.textContent = isRandomMode ? '🔀 RANDOM' : '🔁 SEQUENTIAL';
+            elements.modeToggle.style.background = isRandomMode ? 'linear-gradient(135deg, var(--pink), var(--pink-dark))' : 'white';
+            elements.modeToggle.style.color = isRandomMode ? 'white' : 'var(--pink)';
+            vibrate([20]);
+        }
+
+        function init() {
+            updateWord();
+            
+            if ('speechSynthesis' in window) {
+                isSpeechSupported = true;
+                
+                const voices = speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    speechSynthesis.addEventListener('voiceschanged', () => {
+                        isSpeechSupported = true;
+                    });
+                }
+            }
+            
+            if ('vibrate' in navigator) {
+                elements.vibrationDemo.textContent = '📳 Vibration Ready';
+            }
+            
+            wordButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const type = button.getAttribute('data-type');
+                    handleButtonClick(type);
+                });
+            });
+            
+            elements.prevButton.addEventListener('click', () => navigate('prev'));
+            elements.nextButton.addEventListener('click', () => navigate('next'));
+            elements.playAllButton.addEventListener('click', playAllSounds);
+            elements.modeToggle.addEventListener('click', toggleMode);
+            
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            elements.wordCard.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            elements.wordCard.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) {
+                        navigate('next');
+                    } else {
+                        navigate('prev');
+                    }
+                }
+            });
+            
+            showTapHint();
+            
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    speechSynthesis.cancel();
+                }
+            });
+        }
+
+        window.addEventListener('load', init);
+    </script>
+   <div class="progress" id="progress">1 / 50</div>
+
+        <!-- Add this footer section after the progress div -->
+        <footer class="app-footer">
+            © 2023 MKLAB Corporation. All rights reserved.
+        </footer>
+    </div> 
+</body>
+</html>
